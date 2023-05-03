@@ -1,8 +1,8 @@
 EXE = life
 OBJS = main.c board.c sim.c
-LIBS = 
-CFLAGS := -O0 -g --std=gnu99 -L/home/linux/ieng6/cs30sp21/public/local/x86/lib
-C_DEBUG_FLAGS := -O0 -g --std=gnu99 -L/home/linux/ieng6/cs30sp21/public/local/x86/lib
+LIBS = -lcse30life
+CFLAGS := -g --std=gnu99 -L/home/linux/ieng6/cs30sp23/public/lib
+C_DEBUG_FLAGS := -g --std=gnu99 -L/home/linux/ieng6/cs30sp23/publiclib
 
 .PHONY: clean
 
