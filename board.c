@@ -1,18 +1,10 @@
-/**
- * Assignment: life
- * Name :TODO
- * PID: TODO
- * Class: UCSD CSE30-SP21
- *
- */
 #include "cse30life.h"
 #include "board.h"
-
 
 /**
  * create a new board
  *
- * - malloc a boards structure
+ * - malloc a Board structure
  * - set the generation to 0
  * - open the file (if it doesn't exist, return a NULL pointer
  * - read the first line which is the number of rows
@@ -27,38 +19,34 @@
  * - close the file
  * - return the boards pointer if successfull or NULL ptr otherwise
  */
-boards_t * createBoard(char *initFileName){
-  // TODO: 
+Board* create_board(const char* filename) {
+	// TODO
 }
-
-
 
 /**
  * delete a board
  */
-void deleteBoard(boards_t **bptrPtr){
-  // TODO:
+void delete_board(Board** bpp) {
+	// TODO
 }
 
 /**
  * set all the belems in both buffers to 0
  */
-void clearBoards(boards_t *self){
-  // TODO:
+void clear_board(Board* board) {
+	// TODO
 }
 
 /**
  * swap the current and next buffers
  */
-void swapBuffers(boards_t *self){
-  // TODO:
+void swap_buffers(Board* board) {
+	// TODO
 }
-
 
 /**
  * get a cell index
  */
-size_t getIndex(size_t numCols, size_t row, size_t col){
-  // TODO:
+size_t get_index(size_t num_cols, size_t row, size_t col) {
+	// TODO
 }
-  

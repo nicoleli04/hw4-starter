@@ -1,133 +1,149 @@
-/**
- * Assignment: life
- * Name : TODO
- * PID : TODO
- * Class: UCSD CSE30-SP21
- *
- */
-
 #include "cse30life.h"
 #include "board.h"
 #include "sim.h"
 #include "assert.h"
+#include <stdbool.h>
+#include <strings.h>
 
-
-typedef struct options {
-	char *initFileName;
-} options_t;
-
+typedef struct {
+	char* filename;
+	bool ascii;
+} Args;
 
 /**
  * help printing routine
  * print descrption of all the options as well as interactive commands.
  */
-void printHelp(const char *name){
-  printf("Usage %s initialconfiguration\n", name);
-  printf("Interactive commands:\n");
-  printf("\td filename : dump the current state to filename\n");
-  printf("\tn N  : run the simulation N steps without displaying intermediate results\n");
-  printf("\ts N  : run the simulation N steps displaying intermediate results\n");
-  printf("\tq : quit\n");
-  exit(1);
+void help_and_exit(const char* name) {
+	printf("Usage: %s <file> [ascii]\n", name);
+	printf("Interactive commands:\n");
+	printf("\td filename: dump the current state to filename\n");
+	printf("\tn N: run the simulation N steps without displaying intermediate results\n");
+	printf("\ts N: run the simulation N steps displaying intermediate results\n");
+	printf("\tq: quit\n");
+	exit(EXIT_FAILURE);
 }
-
 
 /**
  * parse the input options
  *
  */
-void parseOpts(int argc, char **argv, options_t *userOptsP) {
-	if(argc != 2) {
-		printHelp(argv[0]);
-		exit(EXIT_FAILURE);
+void parse_opts(int argc, char** argv, Args* args) {
+	if (argc != 2 && argc != 3) {
+		help_and_exit(argv[0]);
 	}
-	userOptsP->initFileName = argv[1];
+	args->filename = argv[1];
+	args->ascii = false;
+	if (argc == 3) {
+		if (strcmp(argv[2], "ascii") == 0) {
+			args -> ascii = true;
+		} else {
+			help_and_exit(argv[0]);
+		}
+	}
 }
 
 /**
  * main - parse options, call functions.
  *
- * - parse the command line options.
+ * - parse the command line options
  * - create the board structure
- * - call loadboard() to load initial map. If no loadboard file is specified, loadboard
- *   provides a simple default.
- * - if in graphicsMode, create an window to display the simulation
+ * - load the board
  * - plot the initial board
  * - while !done
  *     get a command from the user
  *     simulate for the specified number of cycles
  *     display
  */
-int main(int argc, char **argv) {
-	boards_t *boards;
-	options_t userOpts;
+int main(int argc, char** argv) {
+	Board* boards;
+	Args args;
 
-	parseOpts(argc, argv, &userOpts);
+	parse_opts(argc, argv, &args);
 
-	if (argv[1] == NULL){
-		fprintf(stderr, "must provide an initial file name\n");
-		exit(1);
+	if ((boards = create_board(args.filename)) == NULL) {
+		fprintf(stderr, "Failed to process file %s\n", args.filename);
+		exit(EXIT_FAILURE);
 	}
 
-	if ((boards = createBoard(argv[1])) == NULL) {
-		fprintf(stderr, "Failed to process file %s\n", argv[1]);
-		exit(1);
-	}
-
-	printf("simulating life board %lu rows %lu cols\n",
-		boards->numRows, boards->numCols);
+	printf("simulating life board %zu rows %zu cols\n", boards->num_rows, boards->num_cols);
 	fflush(stdout);
 
-	int done=0;
-	int stepSize = 1;  // number of steps that sim(..) will simulate <= quanta
+	bool done = false;
+	int step_size = 1;  // number of steps that sim(..) will simulate <= quanta
 	int quanta = 1;    // total number of steps to simulate
-	const int ibufSize = 128;
+	const int ibuf_size = 128;
 
 	while (!done) {
-		char ibuf[ibufSize];
+		char ibuf[ibuf_size];
 
-		printAsciiBoard(boards->currentBuffer, boards->numRows, boards->numCols, boards->gen);
+		clear_screen();
+		print_board(
+			boards->current_buffer,
+			boards->num_rows,
+			boards->num_cols,
+			boards->gen,
+			args.ascii
+		);
 
 		printf("cmd(d filename, s [#], n [#], q) : ");
 		fflush(stdout);
 
-		fgets(ibuf, ibufSize, stdin);
+		fgets(ibuf, ibuf_size, stdin);
 		fflush(stdout);
 		
 		if (ibuf[0] == 'q') {
-			done = 1;
+			done = true;
 			break;
 		} else if (ibuf[0] == 's') {
 			sscanf(ibuf, "%*s %d", &quanta);
-			stepSize = 1;
+			step_size = 1;
 		} else if (ibuf[0] == 'n') {
 			sscanf(ibuf, "%*s %d", &quanta);
-			stepSize = quanta;
+			step_size = quanta;
 		} else if (ibuf[0] == 'd') {
-			char dumpFileName[ibufSize];
-			sscanf(ibuf, "%*s %s", dumpFileName);
-			dumpBoard(boards->currentBuffer, boards->numRows, boards->numCols, dumpFileName);
+			char dump[ibuf_size];
+			sscanf(ibuf, "%*s %s", dump);
+			dump_board(boards->current_buffer, boards->num_rows, boards->num_cols, dump);
 			continue;
 		}
 
 		/**
 		 * main simulation loop
-		 *   simulate for quanta steps, display every stepSize
+		 *   simulate for quanta steps, display every step_size
 		 */
-		for (int i=0; i<quanta; i += stepSize) {
-			startMeas();
-			simLoop(boards, stepSize);
-			stopMeas();
-			printf("speed gen/s = %08.2f  gen = %10d\n", (double)stepSize/getSecs(), boards->gen);
+		clear_screen();
+		for (int i = 0; i < quanta; i += step_size) {
+			start_meas();
+			sim_loop(boards, step_size);
+			stop_meas();
+			printf(
+				"speed gen/s = %08.2f  gen = %10d\n",
+				(double) step_size / get_secs(),
+				boards->gen
+			);
 			fflush(stdout);
-
-			printAsciiBoard(boards->currentBuffer, boards->numRows, boards->numCols, boards->gen);
+			print_board(
+				boards->current_buffer,
+				boards->num_rows,
+				boards->num_cols,
+				boards->gen,
+				args.ascii
+			);
 		}
+		clear_screen();
+		print_board(
+			boards->current_buffer,
+			boards->num_rows,
+			boards->num_cols,
+			boards->gen,
+			args.ascii
+		);
 		fflush(stdout);
 	}
 
-	deleteBoard(&boards);
+	delete_board(&boards);
 	assert(boards == NULL);
 
-	exit(EXIT_SUCCESS);
+	return EXIT_SUCCESS;
 } 

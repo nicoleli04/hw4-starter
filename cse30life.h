@@ -1,7 +1,6 @@
-//! CSE30-SP21
-//! cse30life functions
-//! functions to support life!
+//! functions to support life
 
+#include <assert.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,37 +12,38 @@
  * time funcs
  */
 //! start a time measurement
-extern void startMeas();
+extern void start_meas();
 
 //! stop a time measurement
-extern void stopMeas();
+extern void stop_meas();
 
 //! get elapsed seconds
-extern double getSecs();
+extern double get_secs();
 
 /**
  *  predefined shapes
  */
 //! create a glider
-extern void glider(unsigned char *buf, size_t cols, size_t v, size_t h);   
+extern void glider(unsigned char* buf, size_t cols, size_t v, size_t h);
 
 //! create a toad
-extern void toad(unsigned char *buf, size_t cols, size_t v, size_t h); 
+extern void toad(unsigned char* buf, size_t cols, size_t v, size_t h);
 
 //! create an acorn
-extern void acorn(unsigned char *buf, size_t cols, size_t v, size_t h); 
+extern void acorn(unsigned char* buf, size_t cols, size_t v, size_t h);
 
 //! create an oscillator horiz orient
-extern void oscillator(unsigned char *buf, size_t cols, size_t v, size_t h);
+extern void oscillator(unsigned char* buf, size_t cols, size_t v, size_t h);
 
 //! create an oscillator vertical 
-extern void oscillatorV(unsigned char *buf, size_t cols, size_t v, size_t h); 
+extern void oscillator_vert(unsigned char* buf, size_t cols, size_t v, size_t h);
 
 /**
- * board printing
+ * board plotting/printing
  */
 //! print the board to the screen as ascii
-extern void printAsciiBoard(unsigned char *buf, size_t rows, size_t cols, size_t gen);
+extern void print_board(unsigned char* buf, size_t rows, size_t cols, size_t gen, bool legacy);
+extern void clear_screen();
 
 //! dump board to a file
-extern void dumpBoard(unsigned char *buf, size_t rows, size_t cols, const char *dumpFileName);
+extern void dump_board(unsigned char* buf, size_t rows, size_t cols, const char* dump);
