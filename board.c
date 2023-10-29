@@ -31,7 +31,7 @@ void delete_board(Board** bpp) {
 }
 
 /**
- * set all the belems in both buffers to 0
+ * set all the Cells in both buffers to 0
  */
 void clear_board(Board* board) {
 	// TODO
